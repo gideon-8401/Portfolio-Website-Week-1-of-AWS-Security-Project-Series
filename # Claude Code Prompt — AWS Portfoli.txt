@@ -1,0 +1,135 @@
+# Claude Code Prompt — AWS Portfolio Static Website
+
+> Copy everything below the line into Claude Code. Replace bracketed placeholders like `[YOUR NAME]` before running, or leave them and fill them in afterwards.
+
+---
+
+## Prompt
+
+I'm building a personal portfolio website that will be deployed as Week 1 of my AWS portfolio project series. The site will be hosted on **AWS S3 + CloudFront + WAF** with HTTPS via ACM. I need you to build the static website itself — the AWS infrastructure I'll handle separately.
+
+### About me (use this for the content)
+
+- **Name:** [Gideon Oteng]
+- **Tagline:** AWS Cloud & Security Engineer
+- **Location:** Alberta, Canada
+- **Current focus:** Building hands-on AWS projects with a security focus, working toward the AWS Security Specialty certification
+- **Existing certifications:** AWS Certified Solutions Architect – Associate
+- **GitHub:** [https://github.com/gideon-8401]
+- **LinkedIn:** [https://www.linkedin.com/in/gideon-oteng-00aba5256/]
+- **Email:** [gideon.dev@yahoo.com]
+
+### Tech stack requirements
+
+- **Plain HTML, CSS, and minimal vanilla JavaScript only** — no build step, no npm, no React, no frameworks. The output must be deployable directly to an S3 bucket as static files.
+- Use **Tailwind CSS via CDN** for styling (the Play CDN is fine for a portfolio: `<script src="https://cdn.tailwindcss.com"></script>`).
+- Use **Google Fonts** (Inter for body, optionally a serif like Lora for headings).
+- Use **Lucide icons via CDN** (`https://unpkg.com/lucide@latest/dist/umd/lucide.js`) for any icons — no emoji.
+- Mobile-responsive (must look good on phones — recruiters often open links on mobile).
+- Single-page design with smooth scroll between sections (Home, About, Projects, Skills, Contact).
+- All assets self-contained or via reputable CDN — no broken local image paths.
+
+### File structure to produce
+
+```
+/portfolio-site
+  index.html
+  /assets
+    favicon.svg
+    profile-placeholder.svg
+    architecture-week1.svg   (placeholder I'll replace)
+  /css
+    custom.css               (optional, only if needed beyond Tailwind)
+  README.md
+  robots.txt
+```
+
+### Content & sections
+
+Build a single-page site with these sections in order. Use anchor links in a sticky top nav.
+
+**1. Hero / Home**
+- Large headline: name + tagline ("AWS Cloud & Security Engineer")
+- 1–2 sentence subheadline: "Building secure, scalable cloud architecture on AWS. Currently focused on cloud security, IAM, and compliance automation."
+- Two CTA buttons: "View Projects" (scrolls to projects) and "Get in Touch" (scrolls to contact)
+- Subtle visual element — clean geometric background or AWS-themed line art (no gradients, no stock photos)
+
+**2. About**
+- Short bio paragraph (3–4 sentences) — placeholder text I can edit, but draft something professional based on the info above
+- Highlight the AWS Solutions Architect Associate certification with a small badge/card
+- Note "Currently studying for: AWS Security Specialty"
+
+**3. Projects**
+- Grid of 5 project cards (responsive: 1 col mobile, 2 cols tablet, 3 cols desktop)
+- Each card has: project number badge (Week 1–5), title, 1-sentence description, list of AWS services as small tags, status badge ("Live" / "In Progress" / "Coming Soon"), and a "View on GitHub" link
+- Project list to populate:
+  1. **Week 1 — Secure Static Portfolio Website** (status: Live) — *S3, CloudFront, WAF, ACM, Route 53*
+  2. **Week 2 — Serverless API with Cognito Auth** (status: Coming Soon) — *Lambda, API Gateway, Cognito, DynamoDB*
+  3. **Week 3 — Production VPC Architecture** (status: Coming Soon) — *VPC, EC2, NAT Gateway, Security Groups*
+  4. **Week 4 — Security Monitoring Pipeline** (status: Coming Soon) — *GuardDuty, CloudTrail, EventBridge, SNS*
+  5. **Week 5 — Automated Compliance Checker** (status: Coming Soon) — *AWS Config, Lambda, Security Hub*
+- For Week 1's card, add a callout: "This site is hosted on the very infrastructure described in this project."
+
+**4. Skills / Tech Stack**
+- Group into categories with small icon badges:
+  - **AWS Services:** S3, CloudFront, Lambda, API Gateway, VPC, IAM, Cognito, GuardDuty, CloudTrail, AWS Config, Security Hub
+  - **Infrastructure as Code:** Terraform (learning), CloudFormation
+  - **Tools:** Git, GitHub, Linux, AWS CLI
+  - **Certifications:** AWS Solutions Architect Associate (with date), AWS Security Specialty (in progress)
+
+**5. Contact**
+- Three large clickable cards/links: Email, LinkedIn, GitHub
+- Each with the appropriate Lucide icon
+- Below them: a small note "Open to AWS Cloud and Security Engineer roles. Available for remote and Alberta-based opportunities."
+
+**Footer**
+- Simple: "© [YEAR] [YOUR NAME] · Built with AWS S3, CloudFront, and WAF · [GitHub repo link]"
+
+### Design requirements
+
+- **Style:** Clean, minimal, professional — think modern engineer portfolio. Lots of whitespace. Sans-serif body text. Subtle hover transitions on cards and buttons.
+- **Color palette:** Mostly neutral (white background, dark gray/near-black text), with one accent color. Use a desaturated AWS-adjacent navy or teal (e.g. `#0F4C75` or `#0F766E`) for accents — NOT the loud AWS orange.
+- **Typography:** Inter for body, weight 400 and 500. Section headings can be slightly larger/bolder. Don't go above font-weight 600.
+- **No:** gradients, drop shadows beyond the most subtle, glassmorphism, animated backgrounds, autoplay videos, popups, or anything cute.
+- **Yes:** functional focus rings on links/buttons (accessibility), `prefers-reduced-motion` respected, semantic HTML5 (`<header>`, `<main>`, `<section>`, `<footer>`), descriptive alt text on all images.
+
+### Technical / SEO / hosting details
+
+- Set the document `<title>` to "[YOUR NAME] — AWS Cloud & Security Engineer"
+- Add a meta description suitable for recruiter Google searches
+- Add Open Graph meta tags so the link previews well when shared on LinkedIn (`og:title`, `og:description`, `og:type`, `og:url`, `og:image`)
+- Add a `favicon.svg` — generate a simple monogram of my initials in the accent color
+- Add `robots.txt` with `User-agent: * / Allow: /`
+- All internal navigation should use anchor links (`#about`, `#projects`, etc.) for smooth single-page scroll
+- Make sure the file works when opened directly in a browser (`file://`) AND when served from S3
+- Add a comment at the top of `index.html` noting deployment target: S3 static website hosting + CloudFront
+
+### README.md content
+
+Generate a `README.md` for the GitHub repo with:
+- Project title: "AWS Portfolio Website — Week 1 of AWS Security Project Series"
+- Overview paragraph
+- Architecture section (placeholder for diagram I'll add later)
+- AWS services used (with bullet list)
+- Security features implemented (HTTPS via ACM, WAF managed rules, S3 bucket public access blocked, OAC for CloudFront, etc.)
+- How to deploy (high-level steps — `aws s3 sync`, CloudFront invalidation)
+- Lessons learned (placeholder section for me to fill in)
+- License: MIT
+
+### Final deliverable
+
+Build all files in a `/portfolio-site` directory. After you're done, give me:
+1. A summary of what you built and any decisions you made
+2. The exact `aws s3 sync` and `aws cloudfront create-invalidation` commands I'll need to deploy
+3. A short checklist of what I should customize before deploying (placeholder text, links, etc.)
+
+Don't deploy anything — I'll handle the AWS side. Just produce the static files.
+
+---
+
+## Tips for using this prompt
+
+- Run it in a fresh Claude Code session in an empty directory
+- After it generates, open `index.html` in your browser to preview before deploying
+- Customize all `[YOUR NAME]`, `[YOUR EMAIL]`, etc. placeholders before the site goes live
+- Once your Week 2 project is done, ask Claude Code to update the projects section to mark Week 2 as "Live" with a real GitHub link

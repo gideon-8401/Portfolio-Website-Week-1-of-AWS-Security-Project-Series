@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Gideon Oteng — AWS Cloud and Security Engineer">
+  <defs>
+    <pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0 L0 0 0 40" fill="none" stroke="#0F766E" stroke-opacity="0.10" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#FFFFFF"/>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <circle cx="1080" cy="120" r="160" fill="none" stroke="#0F766E" stroke-opacity="0.18" stroke-width="2"/>
+  <circle cx="1080" cy="120" r="100" fill="none" stroke="#0F766E" stroke-opacity="0.12" stroke-width="2"/>
+  <rect x="80" y="80" width="64" height="64" rx="12" fill="#0F766E"/>
+  <text x="112" y="124" text-anchor="middle" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="600" font-size="28" fill="#FFFFFF">GO</text>
+  <text x="80" y="320" font-family="Lora, Georgia, serif" font-weight="600" font-size="64" fill="#111827">Gideon Oteng</text>
+  <text x="80" y="380" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="500" font-size="32" fill="#374151">AWS Cloud &amp; Security Engineer</text>
+  <text x="80" y="440" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="400" font-size="22" fill="#6B7280">Building secure, scalable cloud architecture on AWS.</text>
+  <line x1="80" y1="500" x2="240" y2="500" stroke="#0F766E" stroke-width="3"/>
+  <text x="80" y="540" font-family="Inter, Helvetica, Arial, sans-serif" font-weight="500" font-size="18" fill="#0F766E">Alberta, Canada</text>
+</svg>

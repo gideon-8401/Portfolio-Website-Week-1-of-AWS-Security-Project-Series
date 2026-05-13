@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" role="img" aria-label="Week 1 architecture: user request through Route 53, CloudFront with WAF, ACM-issued HTTPS, and a private S3 bucket origin">
+  <style>
+    .box { fill: #FFFFFF; stroke: #0F766E; stroke-width: 2; }
+    .label { font-family: Inter, Helvetica, Arial, sans-serif; font-size: 14px; fill: #111827; }
+    .sub   { font-family: Inter, Helvetica, Arial, sans-serif; font-size: 11px; fill: #6B7280; }
+    .arrow { stroke: #0F766E; stroke-width: 2; fill: none; marker-end: url(#tri); }
+    .pill  { fill: #E6F2F0; stroke: #0F766E; stroke-width: 1; }
+  </style>
+  <defs>
+    <marker id="tri" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0F766E"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="500" fill="#FFFFFF"/>
+  <text x="40" y="40" font-family="Lora, Georgia, serif" font-weight="600" font-size="22" fill="#111827">Week 1 — Secure Static Site Architecture</text>
+  <text x="40" y="62" class="sub">Placeholder diagram — replace with your final architecture.</text>
+
+  <!-- User -->
+  <rect class="box" x="40" y="200" width="140" height="80" rx="10"/>
+  <text x="110" y="232" class="label" text-anchor="middle">User</text>
+  <text x="110" y="250" class="sub"   text-anchor="middle">HTTPS request</text>
+
+  <!-- Route 53 -->
+  <rect class="box" x="220" y="200" width="160" height="80" rx="10"/>
+  <text x="300" y="232" class="label" text-anchor="middle">Route 53</text>
+  <text x="300" y="250" class="sub"   text-anchor="middle">DNS / alias record</text>
+
+  <!-- CloudFront + WAF -->
+  <rect class="box" x="420" y="180" width="200" height="120" rx="10"/>
+  <text x="520" y="212" class="label" text-anchor="middle">CloudFront</text>
+  <text x="520" y="230" class="sub"   text-anchor="middle">Edge cache · OAC</text>
+  <rect class="pill" x="445" y="245" width="150" height="26" rx="13"/>
+  <text x="520" y="262" class="sub"   text-anchor="middle">AWS WAF (managed rules)</text>
+
+  <!-- ACM (cert source) -->
+  <rect class="box" x="420" y="80"  width="200" height="60" rx="10"/>
+  <text x="520" y="106" class="label" text-anchor="middle">ACM</text>
+  <text x="520" y="124" class="sub"   text-anchor="middle">TLS certificate (us-east-1)</text>
+  <line x1="520" y1="140" x2="520" y2="180" class="arrow"/>
+
+  <!-- S3 -->
+  <rect class="box" x="660" y="200" width="180" height="80" rx="10"/>
+  <text x="750" y="232" class="label" text-anchor="middle">S3 Bucket (private)</text>
+  <text x="750" y="250" class="sub"   text-anchor="middle">Public access blocked</text>
+
+  <!-- Arrows -->
+  <line x1="180" y1="240" x2="220" y2="240" class="arrow"/>
+  <line x1="380" y1="240" x2="420" y2="240" class="arrow"/>
+  <line x1="620" y1="240" x2="660" y2="240" class="arrow"/>
+
+  <!-- Notes -->
+  <text x="40"  y="360" class="sub">1. User resolves the apex via Route 53 to the CloudFront distribution.</text>
+  <text x="40"  y="380" class="sub">2. CloudFront terminates TLS (ACM) and evaluates AWS WAF rules.</text>
+  <text x="40"  y="400" class="sub">3. CloudFront fetches the object from a private S3 bucket via Origin Access Control.</text>
+  <text x="40"  y="420" class="sub">4. The S3 bucket policy permits access only from the distribution.</text>
+</svg>

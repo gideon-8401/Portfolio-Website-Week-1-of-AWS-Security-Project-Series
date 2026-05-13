@@ -1,0 +1,20 @@
+/* Minimal custom styles layered on top of Tailwind Play CDN. */
+
+html { scroll-behavior: smooth; }
+
+/* Respect reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Offset anchor targets so the sticky header doesn't cover them. */
+section[id] { scroll-margin-top: 5rem; }
+
+/* Tighter focus ring for keyboard users. */
+:focus-visible { outline: none; }

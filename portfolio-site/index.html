@@ -1,0 +1,520 @@
+<!--
+  Gideon Oteng — AWS Cloud & Security Engineer
+  Deployment target: AWS S3 static website hosting + CloudFront (with ACM HTTPS and WAF)
+  Static, no build step. Deployable directly via `aws s3 sync`.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gideon Oteng — AWS Cloud & Security Engineer</title>
+  <meta name="description" content="Gideon Oteng — AWS Cloud & Security Engineer based in Alberta, Canada. AWS Solutions Architect Associate building secure, scalable cloud architecture and working toward the AWS Security Specialty." />
+  <meta name="author" content="Gideon Oteng" />
+  <meta name="theme-color" content="#0F766E" />
+
+  <!-- Open Graph / LinkedIn link previews -->
+  <meta property="og:title" content="Gideon Oteng — AWS Cloud & Security Engineer" />
+  <meta property="og:description" content="AWS Solutions Architect Associate building secure, scalable cloud architecture. Hands-on AWS projects with a security focus." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://example.com/" />
+  <meta property="og:image" content="https://example.com/assets/profile-placeholder.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+  <!-- Google Fonts: Inter (body) + Lora (headings) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@500;600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS (Play CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            accent: {
+              DEFAULT: '#0F766E',
+              dark:    '#0B5C56',
+              soft:    '#E6F2F0',
+            },
+            ink: {
+              DEFAULT: '#111827',
+              soft:    '#374151',
+              muted:   '#6B7280',
+            },
+          },
+          fontFamily: {
+            sans:   ['Inter', 'system-ui', 'sans-serif'],
+            serif:  ['Lora', 'Georgia', 'serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <link rel="stylesheet" href="css/custom.css" />
+</head>
+
+<body class="bg-white text-ink font-sans antialiased selection:bg-accent/20 selection:text-accent-dark">
+
+  <!-- Skip link for keyboard users -->
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-white focus:text-accent-dark focus:px-3 focus:py-2 focus:rounded-md focus:ring-2 focus:ring-accent">Skip to content</a>
+
+  <!-- Sticky top nav -->
+  <header class="sticky top-0 z-40 bg-white/85 backdrop-blur border-b border-gray-100">
+    <nav class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between" aria-label="Primary">
+      <a href="#home" class="flex items-center gap-2 text-ink hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm">
+        <span aria-hidden="true" class="inline-flex items-center justify-center w-8 h-8 rounded-md bg-accent text-white font-medium tracking-tight">GO</span>
+        <span class="font-medium">Gideon Oteng</span>
+      </a>
+
+      <ul class="hidden md:flex items-center gap-8 text-sm text-ink-soft">
+        <li><a href="#about" class="hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm">About</a></li>
+        <li><a href="#projects" class="hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm">Projects</a></li>
+        <li><a href="#skills" class="hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm">Skills</a></li>
+        <li><a href="#contact" class="hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm">Contact</a></li>
+      </ul>
+
+      <a href="#contact" class="hidden md:inline-flex items-center gap-2 text-sm font-medium text-white bg-accent hover:bg-accent-dark transition-colors px-4 py-2 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2">
+        Get in touch
+      </a>
+
+      <!-- Mobile menu toggle -->
+      <button id="menuBtn" type="button" class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md text-ink-soft hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" aria-controls="mobileMenu" aria-expanded="false" aria-label="Open menu">
+        <i data-lucide="menu" aria-hidden="true"></i>
+      </button>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden hidden border-t border-gray-100 bg-white">
+      <ul class="px-6 py-4 space-y-3 text-ink-soft">
+        <li><a href="#about" class="block py-1 hover:text-accent">About</a></li>
+        <li><a href="#projects" class="block py-1 hover:text-accent">Projects</a></li>
+        <li><a href="#skills" class="block py-1 hover:text-accent">Skills</a></li>
+        <li><a href="#contact" class="block py-1 hover:text-accent">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <!-- ============== HERO ============== -->
+    <section id="home" class="relative overflow-hidden border-b border-gray-100">
+      <!-- Subtle geometric line-art background -->
+      <div class="absolute inset-0 -z-10" aria-hidden="true">
+        <svg class="absolute inset-0 w-full h-full opacity-[0.08]" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="56" height="56" patternUnits="userSpaceOnUse">
+              <path d="M 56 0 L 0 0 0 56" fill="none" stroke="#0F766E" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+        <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full border border-accent/15"></div>
+        <div class="absolute top-32 -right-12 w-64 h-64 rounded-full border border-accent/10"></div>
+      </div>
+
+      <div class="max-w-6xl mx-auto px-6 py-24 md:py-32">
+        <p class="inline-flex items-center gap-2 text-xs font-medium tracking-wide uppercase text-accent-dark bg-accent-soft border border-accent/20 px-3 py-1 rounded-full">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent"></span>
+          Available for new opportunities
+        </p>
+
+        <h1 class="mt-6 font-serif text-4xl sm:text-5xl md:text-6xl tracking-tight text-ink leading-[1.1]">
+          Gideon Oteng
+          <span class="block mt-3 text-2xl sm:text-3xl md:text-4xl text-ink-soft font-sans font-medium">AWS Cloud &amp; Security Engineer</span>
+        </h1>
+
+        <p class="mt-6 max-w-2xl text-lg text-ink-soft leading-relaxed">
+          Building secure, scalable cloud architecture on AWS. Currently focused on cloud security, IAM, and compliance automation.
+        </p>
+
+        <div class="mt-10 flex flex-wrap gap-3">
+          <a href="#projects" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-accent hover:bg-accent-dark transition-colors px-5 py-3 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2">
+            <i data-lucide="folder-git-2" class="w-4 h-4" aria-hidden="true"></i>
+            View Projects
+          </a>
+          <a href="#contact" class="inline-flex items-center gap-2 text-sm font-medium text-ink border border-gray-200 hover:border-accent hover:text-accent transition-colors px-5 py-3 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2">
+            <i data-lucide="mail" class="w-4 h-4" aria-hidden="true"></i>
+            Get in Touch
+          </a>
+        </div>
+
+        <ul class="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-ink-muted">
+          <li class="inline-flex items-center gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-accent" aria-hidden="true"></i>Alberta, Canada</li>
+          <li class="inline-flex items-center gap-2"><i data-lucide="badge-check" class="w-4 h-4 text-accent" aria-hidden="true"></i>AWS Solutions Architect – Associate</li>
+          <li class="inline-flex items-center gap-2"><i data-lucide="book-open" class="w-4 h-4 text-accent" aria-hidden="true"></i>Studying for AWS Security Specialty</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============== ABOUT ============== -->
+    <section id="about" class="border-b border-gray-100">
+      <div class="max-w-6xl mx-auto px-6 py-20 md:py-24 grid md:grid-cols-3 gap-12">
+        <div class="md:col-span-1">
+          <p class="text-xs font-medium tracking-widest uppercase text-accent">About</p>
+          <h2 class="mt-2 font-serif text-3xl md:text-4xl text-ink">A little background</h2>
+        </div>
+
+        <div class="md:col-span-2 space-y-6 text-ink-soft text-base leading-relaxed">
+          <p>
+            I'm an AWS Cloud and Security Engineer based in Alberta, Canada. I design, build, and harden cloud infrastructure on AWS — with a particular interest in identity, access, and compliance automation.
+          </p>
+          <p>
+            My focus right now is shipping a series of hands-on AWS projects, each one centered on a real-world security or architecture problem. The site you're reading is project one in that series.
+          </p>
+          <p>
+            I hold the AWS Solutions Architect – Associate certification and am working toward the AWS Security Specialty. When I'm not in the console, I'm reading the AWS Well-Architected Framework, the CIS Benchmarks, or whatever incident postmortem just dropped.
+          </p>
+
+          <div class="mt-8 grid sm:grid-cols-2 gap-4">
+            <div class="border border-gray-200 rounded-lg p-5 hover:border-accent transition-colors">
+              <div class="flex items-start gap-3">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-md bg-accent-soft text-accent">
+                  <i data-lucide="award" class="w-5 h-5" aria-hidden="true"></i>
+                </span>
+                <div>
+                  <p class="text-sm font-medium text-ink">AWS Solutions Architect</p>
+                  <p class="text-xs text-ink-muted">Associate · Certified</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-5 hover:border-accent transition-colors">
+              <div class="flex items-start gap-3">
+                <span class="inline-flex items-center justify-center w-10 h-10 rounded-md bg-accent-soft text-accent">
+                  <i data-lucide="shield-check" class="w-5 h-5" aria-hidden="true"></i>
+                </span>
+                <div>
+                  <p class="text-sm font-medium text-ink">AWS Security Specialty</p>
+                  <p class="text-xs text-ink-muted">Currently studying</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== PROJECTS ============== -->
+    <section id="projects" class="border-b border-gray-100 bg-gray-50/40">
+      <div class="max-w-6xl mx-auto px-6 py-20 md:py-24">
+        <div class="max-w-2xl">
+          <p class="text-xs font-medium tracking-widest uppercase text-accent">Projects</p>
+          <h2 class="mt-2 font-serif text-3xl md:text-4xl text-ink">AWS Security Project Series</h2>
+          <p class="mt-4 text-ink-soft leading-relaxed">
+            A five-week portfolio shipping one production-shaped AWS project per week, each one focused on a different facet of cloud security and architecture.
+          </p>
+        </div>
+
+        <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+          <!-- Week 1 -->
+          <article class="group flex flex-col bg-white border border-gray-200 rounded-lg p-6 hover:border-accent hover:-translate-y-0.5 transition-all duration-200">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center text-xs font-medium tracking-wide uppercase text-accent-dark bg-accent-soft px-2.5 py-1 rounded">Week 1</span>
+              <span class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                Live
+              </span>
+            </div>
+            <h3 class="mt-4 text-lg font-medium text-ink group-hover:text-accent transition-colors">Secure Static Portfolio Website</h3>
+            <p class="mt-2 text-sm text-ink-soft leading-relaxed">A hardened static site fronted by CloudFront with WAF managed rules, ACM HTTPS, and a private S3 origin.</p>
+
+            <div class="mt-4 p-3 rounded-md bg-accent-soft/60 border border-accent/15 text-xs text-accent-dark leading-relaxed">
+              <span class="inline-flex items-center gap-1.5 font-medium"><i data-lucide="info" class="w-3.5 h-3.5" aria-hidden="true"></i>This site is hosted on the very infrastructure described in this project.</span>
+            </div>
+
+            <ul class="mt-4 flex flex-wrap gap-1.5">
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">S3</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">CloudFront</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">WAF</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">ACM</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">Route 53</li>
+            </ul>
+            <a href="https://github.com/gideon-8401" rel="noopener" target="_blank" class="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm self-start">
+              View on GitHub
+              <i data-lucide="arrow-up-right" class="w-4 h-4" aria-hidden="true"></i>
+            </a>
+          </article>
+
+          <!-- Week 2 -->
+          <article class="group flex flex-col bg-white border border-gray-200 rounded-lg p-6 hover:border-accent hover:-translate-y-0.5 transition-all duration-200">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center text-xs font-medium tracking-wide uppercase text-accent-dark bg-accent-soft px-2.5 py-1 rounded">Week 2</span>
+              <span class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Coming Soon
+              </span>
+            </div>
+            <h3 class="mt-4 text-lg font-medium text-ink group-hover:text-accent transition-colors">Serverless API with Cognito Auth</h3>
+            <p class="mt-2 text-sm text-ink-soft leading-relaxed">A Cognito-protected REST API on Lambda + API Gateway with DynamoDB persistence and per-user authorization.</p>
+            <ul class="mt-4 flex flex-wrap gap-1.5">
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">Lambda</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">API Gateway</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">Cognito</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">DynamoDB</li>
+            </ul>
+            <a href="https://github.com/gideon-8401" rel="noopener" target="_blank" class="mt-auto pt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm self-start">
+              View on GitHub
+              <i data-lucide="arrow-up-right" class="w-4 h-4" aria-hidden="true"></i>
+            </a>
+          </article>
+
+          <!-- Week 3 -->
+          <article class="group flex flex-col bg-white border border-gray-200 rounded-lg p-6 hover:border-accent hover:-translate-y-0.5 transition-all duration-200">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center text-xs font-medium tracking-wide uppercase text-accent-dark bg-accent-soft px-2.5 py-1 rounded">Week 3</span>
+              <span class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Coming Soon
+              </span>
+            </div>
+            <h3 class="mt-4 text-lg font-medium text-ink group-hover:text-accent transition-colors">Production VPC Architecture</h3>
+            <p class="mt-2 text-sm text-ink-soft leading-relaxed">A multi-AZ VPC with public and private subnets, NAT Gateway egress, and least-privilege Security Groups.</p>
+            <ul class="mt-4 flex flex-wrap gap-1.5">
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">VPC</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">EC2</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">NAT Gateway</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">Security Groups</li>
+            </ul>
+            <a href="https://github.com/gideon-8401" rel="noopener" target="_blank" class="mt-auto pt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm self-start">
+              View on GitHub
+              <i data-lucide="arrow-up-right" class="w-4 h-4" aria-hidden="true"></i>
+            </a>
+          </article>
+
+          <!-- Week 4 -->
+          <article class="group flex flex-col bg-white border border-gray-200 rounded-lg p-6 hover:border-accent hover:-translate-y-0.5 transition-all duration-200">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center text-xs font-medium tracking-wide uppercase text-accent-dark bg-accent-soft px-2.5 py-1 rounded">Week 4</span>
+              <span class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Coming Soon
+              </span>
+            </div>
+            <h3 class="mt-4 text-lg font-medium text-ink group-hover:text-accent transition-colors">Security Monitoring Pipeline</h3>
+            <p class="mt-2 text-sm text-ink-soft leading-relaxed">A detection pipeline that routes GuardDuty findings and CloudTrail events through EventBridge to SNS for alerting.</p>
+            <ul class="mt-4 flex flex-wrap gap-1.5">
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">GuardDuty</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">CloudTrail</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">EventBridge</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">SNS</li>
+            </ul>
+            <a href="https://github.com/gideon-8401" rel="noopener" target="_blank" class="mt-auto pt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm self-start">
+              View on GitHub
+              <i data-lucide="arrow-up-right" class="w-4 h-4" aria-hidden="true"></i>
+            </a>
+          </article>
+
+          <!-- Week 5 -->
+          <article class="group flex flex-col bg-white border border-gray-200 rounded-lg p-6 hover:border-accent hover:-translate-y-0.5 transition-all duration-200">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center text-xs font-medium tracking-wide uppercase text-accent-dark bg-accent-soft px-2.5 py-1 rounded">Week 5</span>
+              <span class="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                Coming Soon
+              </span>
+            </div>
+            <h3 class="mt-4 text-lg font-medium text-ink group-hover:text-accent transition-colors">Automated Compliance Checker</h3>
+            <p class="mt-2 text-sm text-ink-soft leading-relaxed">Continuous compliance scanning with AWS Config rules, automated Lambda remediation, and Security Hub aggregation.</p>
+            <ul class="mt-4 flex flex-wrap gap-1.5">
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">AWS Config</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">Lambda</li>
+              <li class="text-[11px] font-medium text-ink-soft bg-gray-100 px-2 py-1 rounded">Security Hub</li>
+            </ul>
+            <a href="https://github.com/gideon-8401" rel="noopener" target="_blank" class="mt-auto pt-5 inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm self-start">
+              View on GitHub
+              <i data-lucide="arrow-up-right" class="w-4 h-4" aria-hidden="true"></i>
+            </a>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== SKILLS ============== -->
+    <section id="skills" class="border-b border-gray-100">
+      <div class="max-w-6xl mx-auto px-6 py-20 md:py-24">
+        <div class="max-w-2xl">
+          <p class="text-xs font-medium tracking-widest uppercase text-accent">Skills</p>
+          <h2 class="mt-2 font-serif text-3xl md:text-4xl text-ink">Tech stack</h2>
+          <p class="mt-4 text-ink-soft leading-relaxed">The services and tools I reach for most often when building secure cloud workloads.</p>
+        </div>
+
+        <div class="mt-12 grid gap-8 md:grid-cols-2">
+
+          <!-- AWS Services -->
+          <div class="border border-gray-200 rounded-lg p-6">
+            <div class="flex items-center gap-3">
+              <span class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-accent-soft text-accent">
+                <i data-lucide="cloud" class="w-5 h-5" aria-hidden="true"></i>
+              </span>
+              <h3 class="text-base font-medium text-ink">AWS Services</h3>
+            </div>
+            <ul class="mt-5 flex flex-wrap gap-2">
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">S3</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">CloudFront</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">Lambda</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">API Gateway</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">VPC</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">IAM</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">Cognito</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">GuardDuty</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">CloudTrail</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">AWS Config</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">Security Hub</li>
+            </ul>
+          </div>
+
+          <!-- IaC -->
+          <div class="border border-gray-200 rounded-lg p-6">
+            <div class="flex items-center gap-3">
+              <span class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-accent-soft text-accent">
+                <i data-lucide="layers" class="w-5 h-5" aria-hidden="true"></i>
+              </span>
+              <h3 class="text-base font-medium text-ink">Infrastructure as Code</h3>
+            </div>
+            <ul class="mt-5 flex flex-wrap gap-2">
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">Terraform <span class="text-ink-muted font-normal">(learning)</span></li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">CloudFormation</li>
+            </ul>
+          </div>
+
+          <!-- Tools -->
+          <div class="border border-gray-200 rounded-lg p-6">
+            <div class="flex items-center gap-3">
+              <span class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-accent-soft text-accent">
+                <i data-lucide="wrench" class="w-5 h-5" aria-hidden="true"></i>
+              </span>
+              <h3 class="text-base font-medium text-ink">Tools</h3>
+            </div>
+            <ul class="mt-5 flex flex-wrap gap-2">
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">Git</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">GitHub</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">Linux</li>
+              <li class="text-xs font-medium text-ink-soft bg-gray-100 px-2.5 py-1 rounded">AWS CLI</li>
+            </ul>
+          </div>
+
+          <!-- Certifications -->
+          <div class="border border-gray-200 rounded-lg p-6">
+            <div class="flex items-center gap-3">
+              <span class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-accent-soft text-accent">
+                <i data-lucide="award" class="w-5 h-5" aria-hidden="true"></i>
+              </span>
+              <h3 class="text-base font-medium text-ink">Certifications</h3>
+            </div>
+            <ul class="mt-5 space-y-3">
+              <li class="flex items-start gap-3">
+                <i data-lucide="check-circle-2" class="w-4 h-4 mt-0.5 text-accent flex-none" aria-hidden="true"></i>
+                <div class="text-sm">
+                  <p class="text-ink font-medium">AWS Solutions Architect – Associate</p>
+                  <p class="text-ink-muted text-xs">Certified <!-- add date, e.g. "2025" --></p>
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="circle-dashed" class="w-4 h-4 mt-0.5 text-accent flex-none" aria-hidden="true"></i>
+                <div class="text-sm">
+                  <p class="text-ink font-medium">AWS Security Specialty</p>
+                  <p class="text-ink-muted text-xs">In progress</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== CONTACT ============== -->
+    <section id="contact">
+      <div class="max-w-6xl mx-auto px-6 py-20 md:py-24">
+        <div class="max-w-2xl">
+          <p class="text-xs font-medium tracking-widest uppercase text-accent">Contact</p>
+          <h2 class="mt-2 font-serif text-3xl md:text-4xl text-ink">Let's connect</h2>
+          <p class="mt-4 text-ink-soft leading-relaxed">The fastest ways to reach me are below. I read every message.</p>
+        </div>
+
+        <div class="mt-12 grid gap-4 md:grid-cols-3">
+          <a href="mailto:gideon.dev@yahoo.com" class="group flex items-center gap-4 border border-gray-200 hover:border-accent rounded-lg p-5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+            <span class="inline-flex items-center justify-center w-12 h-12 rounded-md bg-accent-soft text-accent group-hover:bg-accent group-hover:text-white transition-colors">
+              <i data-lucide="mail" class="w-5 h-5" aria-hidden="true"></i>
+            </span>
+            <span>
+              <span class="block text-xs uppercase tracking-wide text-ink-muted">Email</span>
+              <span class="block text-sm font-medium text-ink group-hover:text-accent transition-colors">gideon.dev@yahoo.com</span>
+            </span>
+          </a>
+
+          <a href="https://www.linkedin.com/in/gideon-oteng-00aba5256/" rel="noopener" target="_blank" class="group flex items-center gap-4 border border-gray-200 hover:border-accent rounded-lg p-5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+            <span class="inline-flex items-center justify-center w-12 h-12 rounded-md bg-accent-soft text-accent group-hover:bg-accent group-hover:text-white transition-colors">
+              <i data-lucide="linkedin" class="w-5 h-5" aria-hidden="true"></i>
+            </span>
+            <span>
+              <span class="block text-xs uppercase tracking-wide text-ink-muted">LinkedIn</span>
+              <span class="block text-sm font-medium text-ink group-hover:text-accent transition-colors">/in/gideon-oteng</span>
+            </span>
+          </a>
+
+          <a href="https://github.com/gideon-8401" rel="noopener" target="_blank" class="group flex items-center gap-4 border border-gray-200 hover:border-accent rounded-lg p-5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+            <span class="inline-flex items-center justify-center w-12 h-12 rounded-md bg-accent-soft text-accent group-hover:bg-accent group-hover:text-white transition-colors">
+              <i data-lucide="github" class="w-5 h-5" aria-hidden="true"></i>
+            </span>
+            <span>
+              <span class="block text-xs uppercase tracking-wide text-ink-muted">GitHub</span>
+              <span class="block text-sm font-medium text-ink group-hover:text-accent transition-colors">@gideon-8401</span>
+            </span>
+          </a>
+        </div>
+
+        <p class="mt-10 text-sm text-ink-muted">
+          Open to AWS Cloud and Security Engineer roles. Available for remote and Alberta-based opportunities.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============== FOOTER ============== -->
+  <footer class="border-t border-gray-100 bg-white">
+    <div class="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-ink-muted">
+      <p id="footer-copy">&copy; <span id="year">2026</span> Gideon Oteng &middot; Built with AWS S3, CloudFront, and WAF</p>
+      <a href="https://github.com/gideon-8401" rel="noopener" target="_blank" class="inline-flex items-center gap-1.5 hover:text-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm">
+        <i data-lucide="github" class="w-4 h-4" aria-hidden="true"></i>
+        Source on GitHub
+      </a>
+    </div>
+  </footer>
+
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script>
+    // Render icons
+    if (window.lucide) { lucide.createIcons(); }
+
+    // Dynamic year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Mobile menu toggle
+    (function () {
+      var btn = document.getElementById('menuBtn');
+      var menu = document.getElementById('mobileMenu');
+      if (!btn || !menu) return;
+      btn.addEventListener('click', function () {
+        var open = menu.classList.toggle('hidden') === false;
+        btn.setAttribute('aria-expanded', String(open));
+      });
+      menu.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', function () {
+          menu.classList.add('hidden');
+          btn.setAttribute('aria-expanded', 'false');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
