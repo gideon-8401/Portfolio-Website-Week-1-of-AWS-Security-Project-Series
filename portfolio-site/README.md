@@ -50,7 +50,7 @@ portfolio-site/
 └── README.md
 ```
 
-## Deploy
+## Deploy.
 
 Set these in your shell first:
 
